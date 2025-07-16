@@ -2,6 +2,8 @@ import User from "../models/user.model.js"
 import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 import jwt from 'jsonwebtoken'
+import cloudinary from '../utils/cloudinary.js';
+import fs from 'fs';
 export const signup=async(req,res,next)=>{
     const {username,email,password}=req.body;
     //after body we are going to hash the password
@@ -37,24 +39,31 @@ next(err);
     }
 }
 
-import cloudinary from '../utils/cloudinary.js';
-import fs from 'fs';
-
 export const uploadImage = async (req, res) => {
   try {
-    const result = await cloudinary.uploader.upload(req.file.path);
-    
-    // Delete file from local after uploading
-    fs.unlinkSync(req.file.path);
+    console.log('Incoming file:', req.file); // 👈 Log this
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No image file uploaded' });
+    }
+
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'user_avatars',
+    });
+
+    fs.unlinkSync(req.file.path); // delete temp file
 
     return res.status(200).json({
       success: true,
       imageUrl: result.secure_url,
     });
   } catch (error) {
+    console.error('❌ Cloudinary Upload Error:', error); // 👈 Important
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+
 export const google=async(req,res,next)=>{
     try{
 const user=await User.findOne({email:req.body.email})
