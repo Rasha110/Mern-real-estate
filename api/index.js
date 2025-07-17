@@ -6,6 +6,7 @@ import cloudinary from "./utils/cloudinary.js";
 import authRouter from './routes/auth.route.js'
 dotenv.config();
 import userRouter from './routes/user.route.js'
+import cors from 'cors'
 
 mongoose
   .connect(process.env.MONGO)
@@ -17,6 +18,10 @@ mongoose
   });
 
 const app = express();
+app.use(cors({
+  origin: 'http://localhost:5173', // Vite dev server
+  credentials: true               // ✅ Allow cookies
+}));
 app.use(express.json());
 app.use(cookieParser());
 app.listen(3000, () => {

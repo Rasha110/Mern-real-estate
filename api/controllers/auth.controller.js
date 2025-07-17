@@ -85,7 +85,8 @@ res.cookie('access_token',token,{httpOnly:true}).status(200).json(rest);
     const token=jwt.sign({id: newUser._id },process.env.JWT_SECRET) 
 //we dont want password shows in console/insomnia when we send request
 const {password:pass,...rest}=newUser._doc;
-res.cookie('access_token',token,{httpOnly:true}).status(200).json(rest);
+res.cookie('access_token',token,{httpOnly:true,secure: false, // set to true only in production (HTTPS)
+    sameSite: 'Lax',}).status(200).json(rest);
 
 }
     }catch(error){
