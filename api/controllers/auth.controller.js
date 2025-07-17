@@ -4,6 +4,10 @@ import { errorHandler } from "../utils/error.js";
 import jwt from 'jsonwebtoken'
 import cloudinary from '../utils/cloudinary.js';
 import fs from 'fs';
+import multer from 'multer';
+
+export const upload = multer({ dest: 'uploads/' });
+
 export const signup=async(req,res,next)=>{
     const {username,email,password}=req.body;
     //after body we are going to hash the password
