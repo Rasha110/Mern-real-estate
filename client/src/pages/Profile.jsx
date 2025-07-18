@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { updateUserStart,updateUserFailure,updateUserSuccess,deleteUserFailure,deleteUserStart,deleteUserSuccess,signOutUserStart,signOutUserFailure,signOutUserSuccess } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
+import {Link} from 'react-router-dom'
 function Profile() {
   const dispatch=useDispatch();
   const { currentUser ,loading,error} = useSelector((state) => state.user);
@@ -183,6 +184,7 @@ dispatch(signOutUserSuccess(data))
         <button disabled={loading} className='bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80'>
           {loading ? 'Loading...' : 'Update'}
         </button>
+        <Link className="text-white bg-green-700 text-center p-3 rounded-lg uppercase hover:opacity-85" to={"/create-listing"}>Create Listing</Link>
       </form>
       <div className='flex justify-between mt-5'>
         <span onClick={handleDelete} className='text-red-700 cursor-pointer'>Delete account</span>
