@@ -100,16 +100,27 @@ console.log("Upload preset:", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
     }));
   };
 
-  const handleChange = (e) => {
-    const { id, value, checked, type } = e.target;
+const handleChange = (e) => {
+  const { id, value, checked, type } = e.target;
+
+  setFormData((prev) => {
+    let updatedData;
+
     if (id === 'sale' || id === 'rent') {
-      setFormData((prev) => ({ ...prev, type: id }));
+      updatedData = { ...prev, type: id };
     } else if (id === 'parking' || id === 'furnished' || id === 'offer') {
-      setFormData((prev) => ({ ...prev, [id]: checked }));
+      updatedData = { ...prev, [id]: checked };
     } else if (type === 'text' || type === 'number' || type === 'textarea') {
-      setFormData((prev) => ({ ...prev, [id]: value }));
+      updatedData = { ...prev, [id]: value };
+    } else {
+      updatedData = prev; // fallback
     }
-  };
+
+    console.log('Updated form data:', updatedData); // 👈 shows current data
+    return updatedData;
+  });
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
