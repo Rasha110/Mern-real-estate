@@ -101,7 +101,7 @@ const res=await fetch(`/api/user/delete/${currentUser._id}`,{
 })
 const data=await res.json();
 if(data.success===false){
-  return dispatch(deleteUserFailure(data.message));
+ dispatch(deleteUserFailure(data.message));
   return;
 }
 dispatch(deleteUserSuccess(data)) 
@@ -136,6 +136,7 @@ dispatch(signOutUserSuccess(data))
           hidden
           accept='image/*'
         />
+        
         <img
           onClick={() => fileRef.current.click()}
           src={formData.avatar || currentUser.avatar}
