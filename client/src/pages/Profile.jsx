@@ -91,7 +91,21 @@ const handleSubmit=async(e)=>{
 dispatch(updateUserFailure(error.message))
   }
 }
-
+const handleListingDelete=async(listingId)=>{
+try{
+const res=await fetch(`/api/listing/delete/${listingId}`,{
+  method: 'DELETE',
+})
+const data=await res.json();
+if(data.success===false){
+ console.log(data.message);
+  return;
+}
+setUserListings((prev)=>prev.filter((listing)=>listing._id !== listingId))
+}catch(error){
+  console.log(error.message);
+}
+}
 const handleDelete=async()=>{
   try{
     dispatch(deleteUserStart());
@@ -220,7 +234,7 @@ return dispatch(sethandleShowListingsError(error.message));
 <p>{listing.name}</p>
 </Link>
 <div className='flex flex-col item-center'>
-  <button className='text-red-700 uppercase '>Delete</button>
+  <button onClick={()=>{handleListingDelete(listing._id)}} className='text-red-700 uppercase '>Delete</button>
     <button className='text-green-700 uppercase '>Edit</button>
 
 </div>
