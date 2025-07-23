@@ -25,19 +25,26 @@ function UpdateListing() {
      const [uploading, setUploading] = useState(false);
      const [error, setError] = useState(false);
      const [loading, setLoading] = useState(false);
-   useEffect(()=>{
-   const fetchListing=async()=>{
-     const listingId=params.listingId;
-     const res=await fetch(`/api/listing/get/${listingId}`);
-     const data=await res.json();
-   if(data.success===false){
-    console.log(data.message);
-    return;
-   }
-   setFormData(data);
+  useEffect(() => {
+  const fetchListing = async () => {
+    try {
+      const listingId = params.listingId;
+      const res = await fetch(`/api/listing/get/${listingId}`);
+      if (!res.ok) {
+        const errData = await res.json();
+        console.error('Error:', errData.message || 'Failed to fetch listing');
+        return;
+      }
+      const data = await res.json();
+      setFormData(data);
+    } catch (err) {
+      console.error('Fetch error:', err.message);
     }
-   fetchListing();
-   },[])
+  };
+
+  fetchListing();
+}, []);
+
     const handleImageSubmit = async () => {
      setImageUploadError(false);
    

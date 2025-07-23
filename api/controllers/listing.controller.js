@@ -29,7 +29,7 @@ export const updateListing=async(req,res,next)=>{
    return next(errorHandler(401,"You can delete your own listings!")); 
    }
 try{
-const updateListing=await Listing.findByIdAndDelete(
+const updateListing=await Listing.findByIdAndUpdate(
     req.params.id,
     req.body,
     {new:true}
