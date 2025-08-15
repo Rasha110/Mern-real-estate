@@ -18,7 +18,7 @@ const app = express();
 // --- CORS ---
 const allowedOrigins = [
   "http://localhost:5173",
-  process.env.CLIENT_URL || "https://meek-paprenjak-1afbbf.netlify.app/",
+  process.env.CLIENT_URL || "https://meek-paprenjak-1afbbf.netlify.app",
 ].filter(Boolean);
 
 app.use(
