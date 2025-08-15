@@ -34,7 +34,7 @@ function Listing() {
     const fetchListing = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/listing/get/${params.listingId}`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/listing/get/${params.listingId}`);
         const data = await res.json();
 
         if (data.success === false) {
@@ -46,7 +46,7 @@ function Listing() {
         setListing(data);
         setLoading(false);
         setError(false);
-      } catch (error) {
+      } catch(error) {
         setError(true);
         setLoading(false);
       }

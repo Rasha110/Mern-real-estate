@@ -29,7 +29,7 @@ function UpdateListing() {
   const fetchListing = async () => {
     try {
       const listingId = params.listingId;
-      const res = await fetch(`/api/listing/get/${listingId}`);
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/listing/get/${listingId}`);
       if (!res.ok) {
         const errData = await res.json();
         console.error('Error:', errData.message || 'Failed to fetch listing');
@@ -151,7 +151,7 @@ function UpdateListing() {
          setLoading(true);
          setError(false);
    
-         const res = await fetch(`/api/listing/update/${params.listingId}`, {
+         const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/listing/update/${params.listingId}`, {
            method: 'POST',
            headers: {
              'Content-Type': 'application/json',

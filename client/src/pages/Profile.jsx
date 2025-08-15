@@ -37,7 +37,7 @@ const handleFileUpload = async (file) => {
   }, 200);
 
   try {
-    const res = await fetch('/api/auth/upload', {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/upload `, {
       method: 'PATCH',
       body: formDataToSend,
     });
@@ -70,7 +70,7 @@ const handleSubmit=async(e)=>{
   e.preventDefault();
   try{
      dispatch(updateUserStart());
-     const res= await fetch(`/api/user/update/${currentUser._id}`,{
+     const res= await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/update/${currentUser._id}`,{
       method: 'PATCH',
       headers:{
         'Content-Type' : 'application/json'
@@ -94,7 +94,7 @@ dispatch(updateUserFailure(error.message))
 }
 const handleListingDelete=async(listingId)=>{
 try{
-const res=await fetch(`/api/listing/delete/${listingId}`,{
+const res=await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/listing/delete/${listingId}`,{
   method: 'DELETE',
 })
 const data=await res.json();
@@ -110,7 +110,7 @@ setUserListings((prev)=>prev.filter((listing)=>listing._id !== listingId))
 const handleDelete=async()=>{
   try{
     dispatch(deleteUserStart());
-const res=await fetch(`/api/user/delete/${currentUser._id}`,{
+const res=await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/delete/${currentUser._id}`,{
   method: 'DELETE',
 
 })
@@ -127,7 +127,7 @@ dispatch(deleteUserSuccess(data))
 const handleSignOut=async()=>{
   try{
 dispatch(signOutUserStart());
-const res=await fetch('/api/auth/signout')
+const res=await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/signout`)
 const data=await res.json();
 if(data.success===false){
    dispatch(signOutUserFailure(data.message));
@@ -142,7 +142,7 @@ dispatch(signOutUserSuccess(data))
 const handleShowListings=async()=>{
 try{
   sethandleShowListingsError(false)
-const res=await fetch(`/api/user/listings/${currentUser._id}`);
+const res=await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/listings/${currentUser._id}`);
 const data=await res.json();
 if(data.success===false){
    sethandleShowListingsError(true)
