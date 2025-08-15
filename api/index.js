@@ -18,7 +18,7 @@ const app = express();
 // --- CORS ---
 app.use(express.json());
 app.use(
-  cors({ origin: "https://meek-paprenjak-1afbbf.netlify.app/", credentials: true })
+  cors({ origin: "https://meek-paprenjak-1afbbf.netlify.app", credentials: true })
 );
 app.use(cookieParser());
 // --- Core middleware ---
