@@ -18,7 +18,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://your-netlify-app.netlify.app",
+    origin: "https://meek-paprenjak-1afbbf.netlify.app",
     credentials: true
   })
 );
