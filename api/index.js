@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import serverless from "serverless-http";
 
 import cloudinary from "../utils/cloudinary.js";
 import authRouter from "../routes/auth.route.js";
@@ -15,18 +16,11 @@ dotenv.config();
 const app = express();
 
 // --- CORS ---
-const allowedOrigins = [
-  "http://localhost:5173",
-  process.env.CLIENT_URL || "https://meek-paprenjak-1afbbf.netlify.app",
-].filter(Boolean);
-
+app.use(express.json());
 app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
+  cors({ origin: "https://meek-paprenjak-1afbbf.netlify.app/", credentials: true })
 );
-
+app.use(cookieParser());
 // --- Core middleware ---
 app.use(express.json());
 app.use(cookieParser());
@@ -51,10 +45,10 @@ app.use(async (req, res, next) => {
 });
 
 // --- Routes ---
-app.get("/health", (req, res) => res.json({ ok: true }));
-app.use("/user", userRouter);
-app.use("/auth", authRouter);
-app.use("/listing", listingRouter);
+app.get("/api/health", (req, res) => res.json({ ok: true }));
+app.use("/api/user", userRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/listing", listingRouter);
 
 // --- Error handler ---
 app.use((err, req, res, next) => {
