@@ -36,7 +36,7 @@ app.use(async (req, res, next) => {
   try {
     await connectDB();
     next();
-  } catch (e) {
+  } catch(e) {
     next(e);
   }
 });
