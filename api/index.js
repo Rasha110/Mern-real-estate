@@ -6,9 +6,9 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-import authRouter from "../routes/auth.route.js";
-import userRouter from "../routes/user.route.js";
-import listingRouter from "../routes/listing.route.js";
+import authRouter from "./routes/auth.route.js";
+import userRouter from "./routes/user.route.js";
+import listingRouter from "./routes/listing.route.js";
 
 dotenv.config();
 
