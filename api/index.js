@@ -18,47 +18,55 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://meek-paprenjak-1afbbf.netlify.app", // your frontend URL
+    origin: "https://meek-paprenjak-1afbbf.netlify.app",
     credentials: true,
   })
 );
 app.use(cookieParser());
 
-// DB Connection (cached for serverless)
-let isConnected = false;
+// --- MongoDB connection (cached for Vercel serverless) ---
+let cached = global.mongoose;
+if (!cached) cached = global.mongoose = { conn: null, promise: null };
+
 async function connectDB() {
-  if (isConnected) return;
-  await mongoose.connect(process.env.MONGO);
-  isConnected = true;
-  console.log("✅ MongoDB connected");
+  if (cached.conn) return cached.conn;
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(process.env.MONGO, {
+      bufferCommands: false,
+    }).then((mongoose) => mongoose);
+  }
+  cached.conn = await cached.promise;
+  return cached.conn;
 }
 
-// Connect DB on every request
+// Ensure DB connection before handling any request
 app.use(async (req, res, next) => {
   try {
     await connectDB();
     next();
-  } catch (e) {
-    next(e);
+  } catch (err) {
+    next(err);
   }
 });
 
-// Health check
-app.get("/api/health", (req, res) => res.json({ ok: true }));
-
-// API Routes (all prefixed with /api for consistency)
-app.use("/api/user", userRouter);
-app.use("/api/auth", authRouter);
-app.use("/api/listing", listingRouter);
-
-// Root route (optional)
+// --- Root route ---
 app.get("/", (req, res) => {
   res.send("✅ Backend is live!");
 });
 
-// Error handler
+// --- API routes ---
+app.use("/user", userRouter);
+app.use("/auth", authRouter);
+app.use("/listing", listingRouter);
+
+// --- Health check route ---
+app.get("/api/health", (req, res) => res.json({ ok: true }));
+
+// --- Error handler ---
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
+  console.error(err); // log for debugging
   res.status(statusCode).json({
     success: false,
     statusCode,
@@ -66,5 +74,5 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Export serverless function
+// --- Wrap for serverless ---
 export default serverless(app);
