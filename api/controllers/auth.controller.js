@@ -3,17 +3,12 @@ import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 import cloudinary from "../utils/cloudinary.js";
-import multer from "multer";
-import { Readable } from "stream";
-
-// --- Multer Memory Storage for Vercel ---
-const storage = multer.memoryStorage();
-export const upload = multer({ storage });
 
 // --- Signup ---
 export const signup = async (req, res, next) => {
   const { username, email, password } = req.body;
   const hashedPassword = bcryptjs.hashSync(password, 10);
+
   const newUser = new User({ username, email, password: hashedPassword });
 
   try {
@@ -37,45 +32,29 @@ export const signin = async (req, res, next) => {
     const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
     const { password: pass, ...rest } = validUser._doc;
 
-    res
-      .cookie("access_token", token, { httpOnly: true })
-      .status(200)
-      .json(rest);
+    res.cookie("access_token", token, { httpOnly: true }).status(200).json(rest);
   } catch (err) {
     next(err);
   }
 };
 
-// --- Upload Image (Serverless-friendly) ---
+// --- Upload Image (Serverless-Ready) ---
 export const uploadImage = async (req, res) => {
   try {
-    if (!req.file)
-      return res
-        .status(400)
-        .json({ success: false, message: "No file uploaded" });
+    // In serverless, file comes in `req.body` as base64 or from FormData in frontend
+    if (!req.body.image) {
+      return res.status(400).json({ success: false, message: "No image uploaded" });
+    }
 
-    const streamUpload = (fileBuffer) => {
-      return new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: "user_avatars" },
-          (error, result) => {
-            if (result) resolve(result);
-            else reject(error);
-          }
-        );
-        const readable = new Readable();
-        readable._read = () => {}; // noop
-        readable.push(fileBuffer);
-        readable.push(null);
-        readable.pipe(stream);
-      });
-    };
+    // Upload to Cloudinary directly
+    const result = await cloudinary.uploader.upload(req.body.image, {
+      folder: "user_avatars",
+    });
 
-    const result = await streamUpload(req.file.buffer);
-
-    return res
-      .status(200)
-      .json({ success: true, imageUrl: result.secure_url });
+    return res.status(200).json({
+      success: true,
+      imageUrl: result.secure_url,
+    });
   } catch (error) {
     console.error("❌ Cloudinary Upload Error:", error);
     return res.status(500).json({ success: false, message: error.message });
@@ -100,21 +79,16 @@ export const google = async (req, res, next) => {
         .json(rest);
     } else {
       const generatedPassword =
-        Math.random().toString(36).slice(-8) +
-        Math.random().toString(36).slice(-8);
+        Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
       const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
-
       const newUser = new User({
-        username:
-          req.body.name.split(" ").join("").toLowerCase() +
-          Math.random().toString(36).slice(-8),
+        username: req.body.name.split(" ").join("").toLowerCase() + Math.random().toString(36).slice(-8),
         email: req.body.email,
         password: hashedPassword,
         avatar: req.body.photo,
       });
 
       await newUser.save();
-
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
       const { password: pass, ...rest } = newUser._doc;
 
