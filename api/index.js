@@ -18,7 +18,7 @@ const app = express();
 // --- CORS ---
 app.use(
   cors({
-    origin: "https://meek-paprenjak-1afbbf.netlify.app", // your frontend Netlify URL
+    origin: "https://meek-paprenjak-1afbbf.netlify.app", // frontend Netlify URL
     credentials: true,
   })
 );
@@ -27,7 +27,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// --- DB connection (optimized for serverless) ---
+// --- DB connection ---
 let isConnected = false;
 async function connectDB() {
   if (isConnected) return;
@@ -36,21 +36,20 @@ async function connectDB() {
   console.log("✅ MongoDB connected");
 }
 
-// Middleware to ensure DB connection before any route
 app.use(async (req, res, next) => {
   try {
     await connectDB();
     next();
-  } catch (err) {
-    next(err);
+  } catch (e) {
+    next(e);
   }
 });
 
-// --- Routes (no `/api` prefix here!) ---
-app.get("/health", (req, res) => res.json({ ok: true }));
-app.use("/user", userRouter);
-app.use("/auth", authRouter);
-app.use("/listing", listingRouter);
+// --- Routes (kept `/api` so frontend stays same) ---
+app.get("/api/health", (req, res) => res.json({ ok: true }));
+app.use("/api/user", userRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/listing", listingRouter);
 
 // --- Error handler ---
 app.use((err, req, res, next) => {
@@ -62,5 +61,5 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Export as serverless function for Vercel
+// Export as serverless function
 export default serverless(app);
