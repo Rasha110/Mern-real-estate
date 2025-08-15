@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import serverless from "serverless-http";
 
 import cloudinary from "../utils/cloudinary.js";
 import authRouter from "../routes/auth.route.js";
@@ -15,17 +14,17 @@ dotenv.config();
 
 const app = express();
 
-// --- Middleware ---
+// --- CORS ---
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://meek-paprenjak-1afbbf.netlify.app",
-    credentials: true,
+    origin: "https://meek-paprenjak-1afbbf.netlify.app", // Your Netlify frontend
+    credentials: true
   })
 );
 app.use(cookieParser());
 
-// --- DB connection (cached for serverless) ---
+// --- DB Connection (cached for serverless) ---
 let isConnected = false;
 async function connectDB() {
   if (isConnected) return;
@@ -34,7 +33,7 @@ async function connectDB() {
   console.log("✅ MongoDB connected");
 }
 
-// Ensure DB before any route
+// Ensure DB before handling routes
 app.use(async (req, res, next) => {
   try {
     await connectDB();
@@ -60,5 +59,4 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ✅ Export for Vercel
-export const handler = serverless(app);
+export default app; // ✅ Required for Vercel
