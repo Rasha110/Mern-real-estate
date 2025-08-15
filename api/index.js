@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import serverless from "serverless-http";
 
 import cloudinary from "../utils/cloudinary.js";
 import authRouter from "../routes/auth.route.js";
@@ -67,6 +66,5 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ❌ Do NOT app.listen() on Vercel
-// ✅ Export serverless handler
-export default serverless(app);
+export default app;
+
