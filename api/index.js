@@ -43,5 +43,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ✅ Export the app for Vercel
-export default app;
+// ✅ Wrap Express app in serverless handler for Vercel
+import serverless from "serverless-http";
+export default serverless(app);
