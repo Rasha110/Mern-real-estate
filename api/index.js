@@ -51,10 +51,10 @@ app.use(async (req, res, next) => {
 });
 
 // --- Routes ---
-app.get("/api/health", (req, res) => res.json({ ok: true }));
-app.use("/api/user", userRouter);
-app.use("/api/auth", authRouter);
-app.use("/api/listing", listingRouter);
+app.get("/health", (req, res) => res.json({ ok: true }));
+app.use("/user", userRouter);
+app.use("/auth", authRouter);
+app.use("/listing", listingRouter);
 
 // --- Error handler ---
 app.use((err, req, res, next) => {
