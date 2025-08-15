@@ -1,4 +1,3 @@
-// api/index.js
 import express from "express";
 import serverless from "serverless-http";
 import mongoose from "mongoose";
@@ -19,12 +18,12 @@ app.use(express.json());
 app.use(
   cors({
     origin: "https://meek-paprenjak-1afbbf.netlify.app",
-    credentials: true
+    credentials: true,
   })
 );
 app.use(cookieParser());
 
-// DB Connection (cached)
+// DB Connection (cached for serverless)
 let isConnected = false;
 async function connectDB() {
   if (isConnected) return;
@@ -32,23 +31,25 @@ async function connectDB() {
   isConnected = true;
   console.log("✅ MongoDB connected");
 }
+
 app.use(async (req, res, next) => {
   try {
     await connectDB();
     next();
-  } catch(e) {
+  } catch (e) {
     next(e);
   }
 });
+
+// Root route
 app.get("/", (req, res) => {
   res.send("✅ Backend is live!");
 });
 
 // Routes
-app.get("/api/health", (req, res) => res.json({ ok: true }));
-app.use("/api/user", userRouter);
-app.use("/api/auth", authRouter);
-app.use("/api/listing", listingRouter);
+app.use("/user", userRouter);
+app.use("/auth", authRouter);
+app.use("/listing", listingRouter);
 
 // Error handler
 app.use((err, req, res, next) => {
@@ -60,5 +61,5 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Wrap for serverless
+// Export serverless function
 export default serverless(app);
