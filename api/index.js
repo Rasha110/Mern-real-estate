@@ -40,6 +40,9 @@ app.use(async (req, res, next) => {
     next(e);
   }
 });
+app.get("/", (req, res) => {
+  res.send("✅ Backend is live!");
+});
 
 // Routes
 app.get("/api/health", (req, res) => res.json({ ok: true }));
