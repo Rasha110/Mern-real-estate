@@ -10,16 +10,17 @@ import authRouter from "../routes/auth.route.js";
 import userRouter from "../routes/user.route.js";
 import listingRouter from "../routes/listing.route.js";
 
+import { VercelRequest, VercelResponse } from "@vercel/node"; // optional types
+
 dotenv.config();
 
 const app = express();
 
-// --- CORS ---
 app.use(express.json());
 app.use(
   cors({
     origin: "https://meek-paprenjak-1afbbf.netlify.app", // Your Netlify frontend
-    credentials: true
+    credentials: true,
   })
 );
 app.use(cookieParser());
@@ -33,7 +34,7 @@ async function connectDB() {
   console.log("✅ MongoDB connected");
 }
 
-// Ensure DB before handling routes
+// Ensure DB connection before routes
 app.use(async (req, res, next) => {
   try {
     await connectDB();
@@ -43,13 +44,13 @@ app.use(async (req, res, next) => {
   }
 });
 
-// --- Routes ---
+// Routes
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/listing", listingRouter);
 
-// --- Error handler ---
+// Error handler
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   res.status(statusCode).json({
@@ -59,4 +60,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-export default app; // ✅ Required for Vercel
+// ✅ Export as a Vercel serverless handler
+import serverless from "serverless-http";
+export const handler = serverless(app);
