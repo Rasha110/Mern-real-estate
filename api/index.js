@@ -1,3 +1,4 @@
+// api/index.js
 import express from "express";
 import serverless from "serverless-http";
 import mongoose from "mongoose";
@@ -17,7 +18,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://meek-paprenjak-1afbbf.netlify.app",
+    origin: "https://meek-paprenjak-1afbbf.netlify.app", // your frontend URL
     credentials: true,
   })
 );
@@ -32,6 +33,7 @@ async function connectDB() {
   console.log("✅ MongoDB connected");
 }
 
+// Connect DB on every request
 app.use(async (req, res, next) => {
   try {
     await connectDB();
@@ -41,15 +43,18 @@ app.use(async (req, res, next) => {
   }
 });
 
-// Root route
+// Health check
+app.get("/api/health", (req, res) => res.json({ ok: true }));
+
+// API Routes (all prefixed with /api for consistency)
+app.use("/api/user", userRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/listing", listingRouter);
+
+// Root route (optional)
 app.get("/", (req, res) => {
   res.send("✅ Backend is live!");
 });
-
-// Routes
-app.use("/user", userRouter);
-app.use("/auth", authRouter);
-app.use("/listing", listingRouter);
 
 // Error handler
 app.use((err, req, res, next) => {
