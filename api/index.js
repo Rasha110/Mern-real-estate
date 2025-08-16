@@ -16,7 +16,7 @@ const app = express();
 // DB Connection
 mongoose
   .connect(process.env.MONGO)
-  .then(() => console.log("✅ MongoDB Connected"))
+  .then(() => console.log(" MongoDB Connected"))
   .catch((err) => console.error(" DB Connection Error:", err));
 
 // Middleware
@@ -31,7 +31,7 @@ app.use(cookieParser());
 
 // Routes
 app.get("/api/test", (req, res) => {
-  res.json({ message: "Backend is running 🚀" });
+  res.json({ message: "Backend is running " });
 });
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
