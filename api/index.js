@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import serverless from "serverless-http";
+
 import authRouter from "./routes/auth.route.js";
 import userRouter from "./routes/user.route.js";
 import listingRouter from "./routes/listing.route.js";
@@ -21,26 +23,43 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// Connect to MongoDB before handling requests
-let isConnected = false;
+// ✅ MongoDB connection with caching
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
 async function connectDB() {
-  if (isConnected) return;
-  try {
-    await mongoose.connect(process.env.MONGO);
-    isConnected = true;
-    console.log("✅ MongoDB Connected");
-  } catch (err) {
-    console.error("❌ MongoDB connection error:", err);
+  if (cached.conn) return cached.conn;
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(process.env.MONGO, {
+      bufferCommands: false,
+    });
   }
+  cached.conn = await cached.promise;
+  return cached.conn;
 }
 
 // Routes
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
+  await connectDB();
   res.send("Backend is running 🚀");
 });
-app.use("/api/auth", authRouter);
-app.use("/api/user", userRouter);
-app.use("/api/listing", listingRouter);
+
+app.use("/api/auth", async (req, res, next) => {
+  await connectDB();
+  next();
+}, authRouter);
+
+app.use("/api/user", async (req, res, next) => {
+  await connectDB();
+  next();
+}, userRouter);
+
+app.use("/api/listing", async (req, res, next) => {
+  await connectDB();
+  next();
+}, listingRouter);
 
 // Error handler
 app.use((err, req, res, next) => {
@@ -50,11 +69,5 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ✅ Wrap express in a handler for Vercel
-import serverless from "serverless-http";
-const handler = async (req, res) => {
-  await connectDB();
-  return serverless(app)(req, res);
-};
-
-export default handler;
+// ✅ Correct export for Vercel
+export default serverless(app);
