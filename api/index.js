@@ -1,61 +1,47 @@
 import express from "express";
-import serverless from "serverless-http";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-import authRouter from "./routes/auth.route.js";
-import userRouter from "./routes/user.route.js";
-import listingRouter from "./routes/listing.route.js";
+import cloudinary from "../utils/cloudinary.js";
+import authRouter from "../routes/auth.route.js";
+import userRouter from "../routes/user.route.js";
+import listingRouter from "../routes/listing.route.js";
 
 dotenv.config();
 
 const app = express();
 
-// Middleware
+// CORS setup — allow your Netlify domain
+app.use(cors({
+  origin: process.env.CLIENT_URL || "https://meek-paprenjak-1afbbf.netlify.app/",
+  credentials: true
+}));
+
 app.use(express.json());
-app.use(
-  cors({
-    origin: "https://meek-paprenjak-1afbbf.netlify.app",
-    credentials: true,
-  })
-);
 app.use(cookieParser());
 
-// DB connection (cached for serverless)
-let isConnected = false;
-async function connectDB() {
-  if (isConnected) return;
-  await mongoose.connect(process.env.MONGO);
-  isConnected = true;
-  console.log("✅ MongoDB connected");
-}
-app.use(async (req, res, next) => {
-  try {
-    await connectDB();
-    next();
-  } catch (err) {
-    next(err);
-  }
-});
+// MongoDB connection — only connect once
+mongoose.connect(process.env.MONGO)
+  .then(() => console.log("MongoDB Connected"))
+  .catch(err => console.error(err));
 
-// Root route
-app.get("/", (req, res) => res.send("✅ Backend is live!"));
-
-// API Routes
-app.use("/auth", authRouter);
-app.use("/user", userRouter);
-app.use("/listing", listingRouter);
+// Routes
+app.use("/api/user", userRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/listing", listingRouter);
 
 // Error handler
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
   res.status(statusCode).json({
     success: false,
     statusCode,
-    message: err.message || "Internal Server Error",
+    message
   });
 });
 
-export default serverless(app);
+// ✅ Export the app for Vercel
+export default app;
