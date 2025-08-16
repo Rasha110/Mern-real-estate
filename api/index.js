@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { createServer } from "@vercel/node"; // 👈 add this
 
 import authRouter from "./routes/auth.route.js";
 import userRouter from "./routes/user.route.js";
@@ -24,13 +23,30 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// MongoDB connect (do it once per cold start)
-mongoose
-  .connect(process.env.MONGO)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.error("❌ MongoDB Error:", err));
+// ✅ MongoDB connection with caching (prevents too many connections)
+let isConnected = false;
 
-// Root route (optional, for testing)
+async function connectDB() {
+  if (isConnected) {
+    console.log("⚡ Using existing MongoDB connection");
+    return;
+  }
+
+  try {
+    const db = await mongoose.connect(process.env.MONGO, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    isConnected = db.connections[0].readyState === 1;
+    console.log("✅ MongoDB Connected");
+  } catch (err) {
+    console.error("❌ MongoDB connection error:", err);
+  }
+}
+
+connectDB();
+
+// Root route (for testing)
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
@@ -51,5 +67,5 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ✅ Vercel requires default export
+// ✅ Export app for Vercel
 export default app;
