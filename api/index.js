@@ -13,7 +13,6 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "*",
@@ -23,7 +22,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ MongoDB connection with caching
+// ✅ MongoDB caching
 let cached = global.mongoose;
 if (!cached) {
   cached = global.mongoose = { conn: null, promise: null };
@@ -40,15 +39,20 @@ async function connectDB() {
   return cached.conn;
 }
 
-// Routes
-app.get("/", async (req, res) => {
-  await connectDB();
+// Simple test
+app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
 
+// Make sure DB is connected before routes
 app.use("/api/auth", async (req, res, next) => {
-  await connectDB();
-  next();
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error("❌ DB connect failed:", err.message);
+    res.status(500).json({ error: "Database connection failed" });
+  }
 }, authRouter);
 
 app.use("/api/user", async (req, res, next) => {
@@ -69,5 +73,4 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ✅ Correct export for Vercel
 export default serverless(app);
