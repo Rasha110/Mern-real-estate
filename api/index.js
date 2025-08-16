@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-import cloudinary from "./cloudinary.js";
+import cloudinary from "./utils/cloudinary.js";
 import authRouter from "../routes/auth.route.js";
 import userRouter from "../routes/user.route.js";
 import listingRouter from "../routes/listing.route.js";
