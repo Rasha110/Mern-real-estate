@@ -132,7 +132,7 @@ const handleChange = (e) => {
       setLoading(true);
       setError(false);
 
-      const res = await fetch('/api/listing/create', {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/listing/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
