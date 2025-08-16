@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import serverless from "serverless-http";   // ✅ added
 
 import cloudinary from "./utils/cloudinary.js";
 import authRouter from "./routes/auth.route.js";
@@ -13,19 +14,27 @@ dotenv.config();
 
 const app = express();
 
-// CORS setup — allow your Netlify domain
-app.use(cors({
-  origin: process.env.CLIENT_URL || "https://meek-paprenjak-1afbbf.netlify.app",
-  credentials: true
-}));
+// CORS setup
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "https://meek-paprenjak-1afbbf.netlify.app",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser());
 
-// MongoDB connection — only connect once
-mongoose.connect(process.env.MONGO)
+// MongoDB connection
+mongoose
+  .connect(process.env.MONGO)
   .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.error(err));
+  .catch((err) => console.error(err));
+
+// ✅ Root route (so / doesn’t give "Cannot GET /")
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀");
+});
 
 // Routes
 app.use("/api/user", userRouter);
@@ -39,9 +48,9 @@ app.use((err, req, res, next) => {
   res.status(statusCode).json({
     success: false,
     statusCode,
-    message
+    message,
   });
 });
 
-// ✅ Export the app for Vercel
-export default app;
+// ✅ Export handler for Vercel
+export const handler = serverless(app);
