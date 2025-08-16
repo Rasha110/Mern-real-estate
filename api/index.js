@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import serverless from "serverless-http";   // ⬅️ add this
+
 import authRouter from "./routes/auth.route.js";
 import userRouter from "./routes/user.route.js";
 import listingRouter from "./routes/listing.route.js";
@@ -11,35 +13,60 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-  origin: process.env.CLIENT_URL || "*",
-  credentials: true
-}));
+// CORS setup — allow your frontend
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "https://meek-paprenjak-1afbbf.netlify.app",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser());
 
-mongoose.connect(process.env.MONGO)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.error(err));
+// ✅ MongoDB connection with caching
+let isConnected = false;
 
-// Routes
-app.use("/api/auth", authRouter);
-app.use("/api/user", userRouter);
-app.use("/api/listing", listingRouter);
+async function connectDB() {
+  if (isConnected) {
+    console.log("⚡ Using existing MongoDB connection");
+    return;
+  }
 
-app.get("/health", (req, res) => {
-  res.json({ ok: true, message: "Backend is running 🚀" });
+  try {
+    const db = await mongoose.connect(process.env.MONGO, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    isConnected = db.connections[0].readyState === 1;
+    console.log("✅ MongoDB Connected");
+  } catch (err) {
+    console.error("❌ MongoDB connection error:", err);
+  }
+}
+
+connectDB();
+
+// Root route
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀");
 });
 
-// error handler
+// Routes
+app.use("/api/user", userRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/listing", listingRouter);
+
+// Error handler
 app.use((err, req, res, next) => {
-  res.status(err.statusCode || 500).json({
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  res.status(statusCode).json({
     success: false,
-    message: err.message || "Internal Server Error"
+    statusCode,
+    message,
   });
 });
 
-// ⬇️ export handler for Vercel
-import serverless from "serverless-http";
-export default serverless(app);
+// ✅ Export handler for Vercel
+export const handler = serverless(app);
