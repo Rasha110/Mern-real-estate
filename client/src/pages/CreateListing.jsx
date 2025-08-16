@@ -136,6 +136,7 @@ const handleChange = (e) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+             'Authorization': `Bearer ${currentUser.token}`,
         },
         body: JSON.stringify({ ...formData, userRef: currentUser._id }),
       });
