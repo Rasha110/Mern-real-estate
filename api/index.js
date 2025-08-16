@@ -15,7 +15,7 @@ const app = express();
 
 // CORS setup — allow your Netlify domain
 app.use(cors({
-  origin: process.env.CLIENT_URL || "https://meek-paprenjak-1afbbf.netlify.app/",
+  origin: process.env.CLIENT_URL || "https://meek-paprenjak-1afbbf.netlify.app",
   credentials: true
 }));
 
