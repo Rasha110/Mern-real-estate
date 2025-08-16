@@ -45,24 +45,32 @@ next(err);
 
 export const uploadImage = async (req, res) => {
   try {
-    console.log('Incoming file:', req.file); // 👈 Log this
-
     if (!req.file) {
-      return res.status(400).json({ success: false, message: 'No image file uploaded' });
+      return res.status(400).json({ success: false, message: "No image file uploaded" });
     }
 
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: 'user_avatars',
-    });
+    // Convert buffer to stream and upload to Cloudinary
+    const streamUpload = (req) => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "user_avatars" },
+          (error, result) => {
+            if (result) resolve(result);
+            else reject(error);
+          }
+        );
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+    };
 
-    fs.unlinkSync(req.file.path); // delete temp file
+    const result = await streamUpload(req);
 
     return res.status(200).json({
       success: true,
       imageUrl: result.secure_url,
     });
   } catch (error) {
-    console.error('❌ Cloudinary Upload Error:', error); // 👈 Important
+    console.error("❌ Cloudinary Upload Error:", error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };

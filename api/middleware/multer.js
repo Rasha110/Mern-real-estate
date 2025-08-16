@@ -1,13 +1,6 @@
-import multer from 'multer';
+import multer from "multer";
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Temporary folder
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  },
-});
-
+const storage = multer.memoryStorage(); // store in memory, not disk
 const upload = multer({ storage });
+
 export default upload;
