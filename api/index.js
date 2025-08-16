@@ -30,7 +30,7 @@ app.use(
 app.use(cookieParser());
 
 // Routes
-app.get("/api/test", (req, res) => {
+app.get("/", (req, res) => {
   res.json({ message: "Backend is running " });
 });
 app.use("/api/auth", authRouter);
