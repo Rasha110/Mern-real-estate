@@ -38,7 +38,7 @@ const handleFileUpload = async (file) => {
 
   try {
     const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/upload`, {
-      method: 'PATCH',
+      method: 'POST',
        credentials: "include",
       body: formDataToSend,
     });
@@ -133,7 +133,7 @@ dispatch(deleteUserSuccess(data))
 const handleSignOut=async()=>{
   try{
 dispatch(signOutUserStart());
-const res=await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/signout`)
+const res=await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/signout`,{credentials:"include"})
 const data=await res.json();
 if(data.success===false){
    dispatch(signOutUserFailure(data.message));
