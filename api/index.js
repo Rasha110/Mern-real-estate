@@ -23,7 +23,7 @@ mongoose
 app.use(express.json());
 app.use(
   cors({
-    origin:"hhttps://mern-real-estate-s2ne.vercel.app" ,
+    origin:"https://mern-real-estate-s2ne.vercel.app" ,
     credentials: true,
   })
 );
