@@ -134,6 +134,7 @@ const handleChange = (e) => {
 
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/listing/create`, {
         method: 'POST',
+         credentials: "include",
         headers: {
           'Content-Type': 'application/json',
              'Authorization': `Bearer ${currentUser.token}`,
