@@ -23,7 +23,7 @@ mongoose
 app.use(express.json());
 app.use(
   cors({
-    origin:"https://meek-paprenjak-1afbbf.netlify.app" ,
+    origin:"hhttps://mern-real-estate-s2ne.vercel.app" ,
     credentials: true,
   })
 );
