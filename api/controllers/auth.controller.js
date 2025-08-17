@@ -69,6 +69,7 @@ export const uploadImage = async (req, res) => {
     };
 
     const result = await streamUpload(req);
+console.log("Cloudinary result:", result);
 
     return res.status(200).json({
       success: true,
@@ -87,8 +88,13 @@ export const google = async (req, res, next) => {
     if (user) {
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
       const { password: pass, ...rest } = user._doc;
-      res
-        .cookie("access_token", token, { httpOnly: true })
+     res.cookie("access_token", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "None",
+  path: "/",
+})
+
         .status(200)
         .json(rest);
     } else {
@@ -127,7 +133,15 @@ export const google = async (req, res, next) => {
 // ------------------ SIGNOUT ------------------
 export const signout = (req, res, next) => {
   try {
-    res.clearCookie("access_token");
+ 
+
+   res.clearCookie("access_token", {
+  httpOnly: true,
+  secure: true,
+  sameSite: "None",
+  path: "/",
+});
+
     res.status(200).json("User has been logged out!");
   } catch (err) {
     next(err);
