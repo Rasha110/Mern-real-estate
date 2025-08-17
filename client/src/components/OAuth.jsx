@@ -13,7 +13,7 @@ const provider=new GoogleAuthProvider();
 const auth=getAuth(app)
 const result=await signInWithPopup(auth,provider);
 //now we want to send info to backend
-const res=await fetch("/api/auth/google",{
+const res=await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/google`,{
     method:'POST',
     credentials:"include",
     headers:{
