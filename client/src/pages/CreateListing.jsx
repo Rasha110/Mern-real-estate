@@ -137,7 +137,6 @@ const handleChange = (e) => {
          credentials: "include",
         headers: {
           'Content-Type': 'application/json',
-             'Authorization': `Bearer ${currentUser.token}`,
         },
         body: JSON.stringify({ ...formData, userRef: currentUser._id }),
       });
