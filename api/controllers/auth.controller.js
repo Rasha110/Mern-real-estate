@@ -114,7 +114,7 @@ export const google = async (req, res, next) => {
         .cookie("access_token", token, {
           httpOnly: true,
           secure: true, 
-          sameSite: "Lax",
+          sameSite: "None",
         })
         .status(200)
         .json(rest);

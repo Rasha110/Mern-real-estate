@@ -73,6 +73,7 @@ const handleSubmit=async(e)=>{
      dispatch(updateUserStart());
      const res= await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/update/${currentUser._id}`,{
       method: 'PATCH',
+      
       headers:{
         'Content-Type' : 'application/json'
       },
@@ -97,6 +98,8 @@ const handleListingDelete=async(listingId)=>{
 try{
 const res=await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/listing/delete/${listingId}`,{
   method: 'DELETE',
+         credentials: "include",
+
 })
 const data=await res.json();
 if(data.success===false){
@@ -113,6 +116,8 @@ const handleDelete=async()=>{
     dispatch(deleteUserStart());
 const res=await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/delete/${currentUser._id}`,{
   method: 'DELETE',
+         credentials: "include",
+
 
 })
 const data=await res.json();
@@ -143,8 +148,12 @@ dispatch(signOutUserSuccess(data))
 const handleShowListings=async()=>{
 try{
   sethandleShowListingsError(false)
-const res=await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/listings/${currentUser._id}`);
+const res=await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/listings/${currentUser._id}`,     {  credentials: "include",
+});
+       
+
 const data=await res.json();
+
 if(data.success===false){
    sethandleShowListingsError(true)
   return;
