@@ -15,6 +15,7 @@ const result=await signInWithPopup(auth,provider);
 //now we want to send info to backend
 const res=await fetch("/api/auth/google",{
     method:'POST',
+    credentials:"include",
     headers:{
         'Content-Type': 'application/json'
     },
