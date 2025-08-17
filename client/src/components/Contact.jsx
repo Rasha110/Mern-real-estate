@@ -9,7 +9,7 @@ export default function Contact({listing}) {
     useEffect(()=>{
 const fetchLandLord=async()=>{
   try{
-const res=await fetch(`/api/user/${listing.userRef}`);
+const res=await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user/${listing.userRef}`);
 const data=await res.json();
 setLandlord(data);
   }
