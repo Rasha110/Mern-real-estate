@@ -2,7 +2,7 @@ import { errorHandler } from "./error.js";
 import  jwt  from "jsonwebtoken";
 export const verifyToken=(req,res,next)=>{
     //now we want to get data from cookie
-     const token = authHeader && authHeader.split(" ")[1];
+    const token=req.cookies.access_token;
     //if not token avaialabe, then:
     if(!token) return next(errorHandler(401,'Unauthorized'));
     //But, if there is token:
